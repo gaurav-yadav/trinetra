@@ -26,3 +26,6 @@ pnpm-debug.log*
 
 # local tool configs
 .claude/settings.local.json
+
+# local-only files
+spec.md

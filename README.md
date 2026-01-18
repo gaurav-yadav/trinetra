@@ -6,12 +6,6 @@ Remote control for your terminal sessions — monitor and interact with long-run
 Trinetra mirrors your `tmux` sessions to a mobile web UI. Start a run on your laptop, step away, and still be the one who unblocks it when it asks for input (`y/N` prompts, agent approvals, `Ctrl+C`, etc.).
 
 
-## Security Warning (read first)
-
-Trinetra is intentionally **local-first** and **single-user** (no auth). Treat it like remote keyboard access to your machine.
-
-Run it only on **localhost** or a trusted private network like **Tailscale**. Do not expose it to the public internet (including **ngrok**, port-forwarding, or **Tailscale Funnel**). If you absolutely must, put it behind your own auth/TLS and fully understand the risk.
-
 ## The Pain (and the win)
 
 You kick off something that takes 20 minutes. Then life happens: coffee, commute, meeting.
@@ -66,7 +60,9 @@ The web UI will be available at `http://localhost:5173` and the API at `http://l
 
 ### Remote Access
 
-#### Via Tailscale
+#### Via Tailscale (Recommended)
+
+Tailscale provides encrypted access over WireGuard with no extra auth needed.
 
 1. Install Tailscale on the machine running Trinetra and on your phone
 2. Start the server bound to all interfaces:
@@ -79,13 +75,65 @@ The web UI will be available at `http://localhost:5173` and the API at `http://l
    ```
 4. Access via your Tailscale IP: `http://100.x.x.x:5173`
 
-#### Via ngrok
+#### Via Cloudflare Tunnel + Access
+
+Cloudflare Access adds identity-based authentication (Google, GitHub, etc.) in front of your tunnel.
+
+1. Install cloudflared:
+   ```bash
+   brew install cloudflared
+   ```
+
+2. Authenticate and create a tunnel:
+   ```bash
+   cloudflared tunnel login
+   cloudflared tunnel create trinetra
+   ```
+
+3. Configure the tunnel (`~/.cloudflared/config.yml`):
+   ```yaml
+   tunnel: <TUNNEL_ID>
+   credentials-file: ~/.cloudflared/<TUNNEL_ID>.json
+
+   ingress:
+     - hostname: trinetra.yourdomain.com
+       service: http://localhost:8080
+     - service: http_status:404
+   ```
+
+4. Add DNS record and run:
+   ```bash
+   cloudflared tunnel route dns trinetra trinetra.yourdomain.com
+   cloudflared tunnel run trinetra
+   ```
+
+5. Set up Cloudflare Access (in dashboard):
+   - Go to **Zero Trust → Access → Applications**
+   - Add application → Self-hosted
+   - Set domain to `trinetra.yourdomain.com`
+   - Add policy: Allow emails ending in `@yourdomain.com` (or specific emails)
+
+Now only authenticated users can access Trinetra.
+
+#### Via ngrok with OAuth
+
+ngrok's OAuth integration adds Google/GitHub authentication.
 
 ```bash
-# Recommended: expose the single Docker port (web + API + WebSocket)
+# Start Trinetra
 docker-compose up -d
-ngrok http 8080
+
+# Expose with Google OAuth (replace with your email)
+ngrok http 8080 --oauth=google --oauth-allow-email=you@gmail.com
+
+# Or allow a domain
+ngrok http 8080 --oauth=google --oauth-allow-domain=yourcompany.com
+
+# Or use GitHub
+ngrok http 8080 --oauth=github --oauth-allow-email=you@github.com
 ```
+
+The ngrok OAuth feature requires a paid plan. Free alternative: use basic ngrok + Cloudflare Access.
 
 ### Docker
 

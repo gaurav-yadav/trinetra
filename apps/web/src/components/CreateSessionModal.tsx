@@ -98,6 +98,10 @@ export default function CreateSessionModal({
               value={pathOverride}
               onChange={(e) => setPathOverride(e.target.value)}
               placeholder="/path/to/directory"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
               className="input font-mono text-sm"
             />
           </div>
@@ -132,6 +136,10 @@ export default function CreateSessionModal({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Auto-generated if empty"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
             className="input"
           />
         </div>

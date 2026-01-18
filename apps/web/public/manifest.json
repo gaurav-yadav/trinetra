@@ -1,0 +1,21 @@
+{
+  "name": "Trinetra",
+  "short_name": "Trinetra",
+  "description": "Remote tmux session manager - monitor and control your sessions from anywhere",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#1a1b26",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["developer", "utilities"],
+  "scope": "/",
+  "prefer_related_applications": false
+}

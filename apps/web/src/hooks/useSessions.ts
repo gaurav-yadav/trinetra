@@ -53,24 +53,27 @@ export function useKillSession() {
   });
 }
 
-export function useInterruptSession() {
-  const queryClient = useQueryClient();
+// NOTE: useInterruptSession disabled - backend endpoint not implemented
+// export function useInterruptSession() {
+//   const queryClient = useQueryClient();
+//
+//   return useMutation({
+//     mutationFn: (id: string) => sessionApi.interrupt(id),
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ['sessions'] });
+//     },
+//   });
+// }
 
-  return useMutation({
-    mutationFn: (id: string) => sessionApi.interrupt(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['sessions'] });
-    },
-  });
-}
-
-export function useSyncSessions() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: () => sessionApi.sync(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['sessions'] });
-    },
-  });
-}
+// NOTE: useSyncSessions disabled - backend handles sync automatically in GET /api/sessions
+// The session list endpoint already merges DB sessions with discovered tmux sessions.
+// export function useSyncSessions() {
+//   const queryClient = useQueryClient();
+//
+//   return useMutation({
+//     mutationFn: () => sessionApi.sync(),
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ['sessions'] });
+//     },
+//   });
+// }

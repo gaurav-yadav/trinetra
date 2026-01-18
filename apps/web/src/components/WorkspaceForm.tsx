@@ -71,6 +71,10 @@ export default function WorkspaceForm({
           onChange={(e) => setPath(e.target.value)}
           placeholder="/path/to/project"
           required
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
           className="input font-mono text-sm"
         />
       </div>

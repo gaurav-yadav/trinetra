@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import BottomNav from './components/BottomNav';
+import Toast from './components/Toast';
 import SessionsPage from './pages/SessionsPage';
 import SessionDetailPage from './pages/SessionDetailPage';
 import WorkspacesPage from './pages/WorkspacesPage';
@@ -28,6 +29,7 @@ export default function App() {
         </Routes>
       </main>
       <BottomNav />
+      <Toast />
     </div>
   );
 }

@@ -76,6 +76,10 @@ export default function TemplateForm({
           onChange={(e) => setCommand(e.target.value)}
           placeholder="npm run dev"
           required
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
           className="input font-mono text-sm"
         />
       </div>
@@ -90,6 +94,10 @@ export default function TemplateForm({
           value={shell}
           onChange={(e) => setShell(e.target.value)}
           placeholder="/bin/zsh"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
           className="input font-mono text-sm"
         />
       </div>
@@ -104,6 +112,10 @@ export default function TemplateForm({
           onChange={(e) => setPreCommands(e.target.value)}
           placeholder="cd /path&#10;source .env"
           rows={3}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
           className="input font-mono text-sm resize-none"
         />
       </div>
@@ -118,6 +130,10 @@ export default function TemplateForm({
           onChange={(e) => setPostCommands(e.target.value)}
           placeholder="echo 'Done'"
           rows={2}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
           className="input font-mono text-sm resize-none"
         />
       </div>

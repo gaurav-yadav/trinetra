@@ -52,7 +52,7 @@ export const workspaceApi = {
     }),
   update: (id: string, payload: UpdateWorkspacePayload) =>
     request<Workspace>(`/api/workspaces/${id}`, {
-      method: 'PATCH',
+      method: 'PUT',
       body: JSON.stringify(payload),
     }),
   delete: (id: string) =>
@@ -72,7 +72,7 @@ export const templateApi = {
     }),
   update: (id: string, payload: UpdateTemplatePayload) =>
     request<Template>(`/api/templates/${id}`, {
-      method: 'PATCH',
+      method: 'PUT',
       body: JSON.stringify(payload),
     }),
   delete: (id: string) =>
@@ -96,12 +96,17 @@ export const sessionApi = {
       body: JSON.stringify(payload),
     }),
   kill: (id: string) =>
-    request<void>(`/api/sessions/${id}`, {
-      method: 'DELETE',
-    }),
-  interrupt: (id: string) =>
-    request<void>(`/api/sessions/${id}/interrupt`, {
+    request<void>(`/api/sessions/${id}/kill`, {
       method: 'POST',
+      body: JSON.stringify({}),
     }),
-  sync: () => request<{ discovered: number }>('/api/sessions/sync', { method: 'POST' }),
+  // NOTE: interrupt endpoint not implemented in backend - would need POST /api/sessions/:id/interrupt
+  // interrupt: (id: string) =>
+  //   request<void>(`/api/sessions/${id}/interrupt`, {
+  //     method: 'POST',
+  //   }),
+
+  // NOTE: sync endpoint not implemented in backend. Session discovery is handled automatically
+  // by GET /api/sessions which merges DB sessions with discovered tmux sessions.
+  // sync: () => request<{ discovered: number }>('/api/sessions/sync', { method: 'POST' }),
 };

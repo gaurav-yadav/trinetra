@@ -8,7 +8,9 @@
     "dev:server": "pnpm --filter @trinetra/server dev",
     "dev:web": "pnpm --filter @trinetra/web dev",
     "build": "pnpm -r build",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "clean": "rm -rf apps/*/dist packages/*/dist data logs node_modules/.cache",
+    "doctor": "pnpm --filter @trinetra/server run doctor"
   },
   "devDependencies": {
     "typescript": "^5.7.2"

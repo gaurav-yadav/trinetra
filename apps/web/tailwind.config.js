@@ -36,6 +36,15 @@ export default {
       minWidth: {
         touch: '44px',
       },
+      keyframes: {
+        'slide-in-up': {
+          '0%': { transform: 'translateY(100%)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+      },
+      animation: {
+        'slide-in-up': 'slide-in-up 0.2s ease-out',
+      },
     },
   },
   plugins: [],

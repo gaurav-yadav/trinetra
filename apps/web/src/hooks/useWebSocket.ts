@@ -5,7 +5,9 @@ import type {
   ClientMessage,
   ServerMessage,
   KeyMessage,
+  SessionPhase,
 } from '@trinetra/shared';
+import { notifyPhaseChange } from '../utils/notifications';
 
 const RECONNECT_DELAY = 3000;
 const MAX_RECONNECT_ATTEMPTS = 10;
@@ -14,6 +16,9 @@ const MAX_RECONNECT_ATTEMPTS = 10;
 let wsInstance: WebSocket | null = null;
 let reconnectAttempts = 0;
 let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+
+// Track previous phases to detect changes for notifications
+const previousPhases: Record<string, SessionPhase | undefined> = {};
 
 export function useWebSocket() {
   const wsRef = useRef<WebSocket | null>(null);
@@ -53,6 +58,14 @@ export function useWebSocket() {
             break;
 
           case 'status':
+            // Check for phase change and notify
+            if (message.phase && message.phase !== previousPhases[message.sessionId]) {
+              // Get session title from store or use session ID
+              const sessionState = useSessionStore.getState().sessionStates[message.sessionId];
+              const title = sessionState?.status ? `Session ${message.sessionId.slice(0, 8)}` : message.sessionId.slice(0, 8);
+              notifyPhaseChange(message.sessionId, title, message.phase);
+              previousPhases[message.sessionId] = message.phase;
+            }
             updateSessionState(
               message.sessionId,
               message.status,

@@ -2,18 +2,38 @@ import { useState, useEffect } from 'react';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useSessionStore } from '../stores/sessionStore';
 import { useWebSocket } from '../hooks/useWebSocket';
+import { requestNotificationPermission } from '../utils/notifications';
 
 export default function SettingsPage() {
-  const { serverUrl, setServerUrl } = useSettingsStore();
+  const { serverUrl, setServerUrl, notificationsEnabled, setNotificationsEnabled } = useSettingsStore();
   const wsConnected = useSessionStore((s) => s.wsConnected);
   const { connect, disconnect } = useWebSocket();
 
   const [url, setUrl] = useState(serverUrl);
   const [saved, setSaved] = useState(false);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
+    'Notification' in window ? Notification.permission : 'denied'
+  );
 
   useEffect(() => {
     setUrl(serverUrl);
   }, [serverUrl]);
+
+  const handleNotificationToggle = async () => {
+    if (!notificationsEnabled) {
+      // Enabling - request permission first
+      const granted = await requestNotificationPermission();
+      if (granted) {
+        setNotificationsEnabled(true);
+        setNotificationPermission('granted');
+      } else {
+        setNotificationPermission(Notification.permission);
+      }
+    } else {
+      // Disabling
+      setNotificationsEnabled(false);
+    }
+  };
 
   const handleSave = () => {
     setServerUrl(url);
@@ -101,6 +121,49 @@ export default function SettingsPage() {
               <button onClick={connect} className="btn-primary mt-4 w-full">
                 Reconnect
               </button>
+            )}
+          </div>
+        </section>
+
+        {/* Notifications */}
+        <section className="card">
+          <div className="p-4 border-b border-gray-800">
+            <h2 className="font-medium text-gray-100">Notifications</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Get notified when sessions need attention
+            </p>
+          </div>
+          <div className="p-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-gray-300">Enable Notifications</span>
+                <p className="text-xs text-gray-600 mt-0.5">
+                  Alerts for: waiting for input, tests failed, done
+                </p>
+              </div>
+              <button
+                onClick={handleNotificationToggle}
+                className={`relative w-12 h-6 rounded-full transition-colors ${
+                  notificationsEnabled ? 'bg-blue-600' : 'bg-gray-700'
+                }`}
+                aria-label="Toggle notifications"
+              >
+                <span
+                  className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                    notificationsEnabled ? 'translate-x-6' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+            {notificationPermission === 'denied' && (
+              <p className="text-xs text-red-400">
+                Notifications are blocked. Please enable them in your browser settings.
+              </p>
+            )}
+            {notificationsEnabled && notificationPermission === 'granted' && (
+              <p className="text-xs text-green-400">
+                Notifications enabled and permission granted.
+              </p>
             )}
           </div>
         </section>

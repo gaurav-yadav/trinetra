@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { useToastStore, type Toast as ToastType, type ToastType as ToastVariant } from '../stores/toastStore';
 
-const toastConfig: Record<ToastVariant, { bgClass: string; textClass: string; borderClass: string; icon: JSX.Element }> = {
+const toastConfig: Record<ToastVariant, { bgClass: string; textClass: string; borderClass: string; icon: ReactNode }> = {
   success: {
     bgClass: 'bg-green-500/20',
     textClass: 'text-green-400',

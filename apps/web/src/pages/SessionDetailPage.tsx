@@ -11,7 +11,6 @@ import OutputView from '../components/OutputView';
 import Modal from '../components/Modal';
 
 interface PaneOption {
-  key: string; // Full pane key e.g., "session:0.0"
   paneTarget: string; // Just the window.pane part e.g., "0.0"
   label: string; // e.g., "Window 0: Pane 0"
   windowIndex: number;
@@ -44,7 +43,6 @@ export default function SessionDetailPage() {
       for (const pane of window.panes) {
         const paneTarget = `${window.index}.${pane.index}`;
         options.push({
-          key: `${session.tmuxSession}:${paneTarget}`,
           paneTarget,
           label: session.windows.length === 1 && window.panes.length === 1
             ? `Pane ${pane.index}`
@@ -64,17 +62,13 @@ export default function SessionDetailPage() {
   // Support ?pane=0.0 query param for deep linking to specific panes
   const paneParam = searchParams.get('pane');
 
-  // Determine current pane key
-  const paneKey = useMemo(() => {
+  // Determine current pane target (window.pane)
+  const currentPaneTarget = useMemo(() => {
     if (!session) return null;
 
-    // If pane query param is provided (e.g., ?pane=0.0), use it
-    if (paneParam) {
-      // Validate that the pane exists in paneOptions
-      const exists = paneOptions.some(p => p.paneTarget === paneParam);
-      if (exists) {
-        return `${session.tmuxSession}:${paneParam}`;
-      }
+    // If pane query param is provided (e.g., ?pane=0.0), use it if it exists
+    if (paneParam && paneOptions.some((p) => p.paneTarget === paneParam)) {
+      return paneParam;
     }
 
     // Try to use activePane from session
@@ -82,22 +76,17 @@ export default function SessionDetailPage() {
 
     // Fall back to first pane or default
     if (paneOptions.length > 0) {
-      return paneOptions[0].key;
+      return paneOptions[0].paneTarget;
     }
 
-    return `${session.tmuxSession}:0.0`;
+    return '0.0';
   }, [session, paneParam, paneOptions]);
 
-  // Get current pane target for URL
-  const currentPaneTarget = useMemo(() => {
-    if (!paneKey || !session) return null;
-    // Extract the pane target from the key (e.g., "session:0.0" -> "0.0")
-    const prefix = `${session.tmuxSession}:`;
-    if (paneKey.startsWith(prefix)) {
-      return paneKey.slice(prefix.length);
-    }
-    return null;
-  }, [paneKey, session]);
+  // Unique key for buffering output per session+pane
+  const bufferKey = useMemo(() => {
+    if (!id || !currentPaneTarget) return null;
+    return `${id}:${currentPaneTarget}`;
+  }, [id, currentPaneTarget]);
 
   // Handle pane switching
   const handlePaneSwitch = useCallback((paneTarget: string) => {
@@ -105,20 +94,20 @@ export default function SessionDetailPage() {
   }, [setSearchParams]);
 
   useEffect(() => {
-    if (id && paneKey && isConnected) {
-      setActiveSession(id, paneKey);
-      subscribe(id, paneKey);
+    if (id && currentPaneTarget && isConnected) {
+      setActiveSession(id, bufferKey);
+      subscribe(id, currentPaneTarget);
       return () => {
-        unsubscribe(id, paneKey);
+        unsubscribe(id, currentPaneTarget);
         setActiveSession(null, null);
       };
     }
-  }, [id, paneKey, isConnected, subscribe, unsubscribe, setActiveSession]);
+  }, [id, currentPaneTarget, bufferKey, isConnected, subscribe, unsubscribe, setActiveSession]);
 
   const sessionState = sessionStates[id!];
   const status = sessionState?.status || session?.status;
   const phase = sessionState?.phase || session?.phase;
-  const rawOutput = paneKey ? outputBuffers[paneKey]?.content || '' : '';
+  const rawOutput = bufferKey ? outputBuffers[bufferKey]?.content || '' : '';
   const output = useMemo(() => stripAnsi(rawOutput), [rawOutput]);
 
   const handleCopyCommand = () => {
@@ -137,15 +126,15 @@ export default function SessionDetailPage() {
   };
 
   const handleSendCommand = () => {
-    if (commandInput.trim() && id && paneKey) {
-      sendInput(id, paneKey, commandInput, InputMode.COMMAND);
+    if (commandInput.trim() && id && currentPaneTarget) {
+      sendInput(id, currentPaneTarget, commandInput, InputMode.COMMAND);
       setCommandInput('');
     }
   };
 
   const handleKey = (key: string) => {
-    if (id && paneKey) {
-      sendKey(id, paneKey, key as KeyMessage['key']);
+    if (id && currentPaneTarget) {
+      sendKey(id, currentPaneTarget, key as KeyMessage['key']);
     }
   };
 
@@ -170,7 +159,6 @@ export default function SessionDetailPage() {
 
   const needsAttention = phase === SessionPhase.WAITING || phase === SessionPhase.ERROR;
   const isWaiting = phase === SessionPhase.WAITING;
-  const isError = phase === SessionPhase.ERROR;
 
   return (
     <div className="h-full flex flex-col bg-gray-950">
@@ -271,7 +259,7 @@ export default function SessionDetailPage() {
           <span className="text-xs text-gray-500 mr-1 shrink-0">Panes:</span>
           {paneOptions.map((pane) => (
             <button
-              key={pane.key}
+              key={pane.paneTarget}
               onClick={() => handlePaneSwitch(pane.paneTarget)}
               className={`px-2.5 py-1 text-xs font-medium rounded shrink-0 transition-colors ${
                 currentPaneTarget === pane.paneTarget

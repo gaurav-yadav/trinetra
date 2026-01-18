@@ -6,28 +6,18 @@ Remote control for your terminal sessions — monitor and interact with long-run
 Trinetra mirrors your `tmux` sessions to a mobile web UI. Start a run on your laptop, step away, and still be the one who unblocks it when it asks for input (`y/N` prompts, agent approvals, `Ctrl+C`, etc.).
 
 
-## The Pain (and the win)
+## Why
 
-You kick off something that takes 20 minutes. Then life happens: coffee, commute, meeting.
-
-The CLI doesn't fail when you're away — it waits for a prompt you didn't see. Trinetra turns that dead time into progress: peek in, answer the prompt, and keep going.
-
-## Use Cases
-
-- Approve prompts (`Proceed? (y/N)`) without walking back to your desk
-- Interrupt runaway jobs (`Ctrl+C`) before they waste time
-- Check build/test/agent progress from anywhere
-- Keep multiple repos/sessions moving in parallel
+The CLI doesn't fail when you're away — it waits. Trinetra turns that dead time into progress: check status, answer the prompt, and move on.
 
 ## Features
 
-- **Live Terminal Mirroring** - See exactly what's on your terminal, 1:1
-- **Remote Input** - Send commands, special keys (Ctrl+C, Enter, Escape), and text
-- **Session Management** - Create, list, and kill tmux sessions
-- **Mobile-First UI** - Optimized for phone screens with touch-friendly controls
-- **Phase Detection** - Automatic detection of session state (thinking, tool use, idle, etc.)
-- **Workspaces & Templates** - Save frequently used project paths and launch commands
-- **Works Over Tailscale** - Secure access from anywhere
+- **Needs-attention UX** - Detects `WAITING` / `ERROR`, highlights sessions, and surfaces one-tap actions (y/n/Enter/Ctrl+C)
+- **Sessions** - Create/list/kill, search + phase filters, pin important sessions, preview recent output
+- **Panes** - Switch between panes (and deep-link via `?pane=0.0`)
+- **Terminal ergonomics** - Rolling output buffer (load more), search (Ctrl/Cmd+F), copy last N lines, download logs, jump-to-bottom
+- **PWA + notifications** - Installable web app + optional browser notifications for attention-worthy phases
+- **Workspaces & templates** - Save repo paths and launch commands consistently
 
 <img width="400" height="752" alt="Screenshot 2026-01-18 at 1 48 56 PM" src="https://github.com/user-attachments/assets/da76221f-dfa0-4e7c-b02d-049ba39f8e87" />
 <img width="416" height="752" alt="working" src="https://github.com/user-attachments/assets/36fe9e8b-ddf1-4917-9625-ff6e67ccb602" />
@@ -56,6 +46,8 @@ pnpm --filter @trinetra/server dev
 pnpm --filter @trinetra/web dev
 ```
 
+Tip: `just dev` also starts the full stack if you have `just` installed.
+
 The web UI will be available at `http://localhost:5173` and the API at `http://localhost:3001`.
 
 ### Remote Access
@@ -75,65 +67,9 @@ Tailscale provides encrypted access over WireGuard with no extra auth needed.
    ```
 4. Access via your Tailscale IP: `http://100.x.x.x:5173`
 
-#### Via Cloudflare Tunnel + Access
+#### Other Options
 
-Cloudflare Access adds identity-based authentication (Google, GitHub, etc.) in front of your tunnel.
-
-1. Install cloudflared:
-   ```bash
-   brew install cloudflared
-   ```
-
-2. Authenticate and create a tunnel:
-   ```bash
-   cloudflared tunnel login
-   cloudflared tunnel create trinetra
-   ```
-
-3. Configure the tunnel (`~/.cloudflared/config.yml`):
-   ```yaml
-   tunnel: <TUNNEL_ID>
-   credentials-file: ~/.cloudflared/<TUNNEL_ID>.json
-
-   ingress:
-     - hostname: trinetra.yourdomain.com
-       service: http://localhost:8080
-     - service: http_status:404
-   ```
-
-4. Add DNS record and run:
-   ```bash
-   cloudflared tunnel route dns trinetra trinetra.yourdomain.com
-   cloudflared tunnel run trinetra
-   ```
-
-5. Set up Cloudflare Access (in dashboard):
-   - Go to **Zero Trust → Access → Applications**
-   - Add application → Self-hosted
-   - Set domain to `trinetra.yourdomain.com`
-   - Add policy: Allow emails ending in `@yourdomain.com` (or specific emails)
-
-Now only authenticated users can access Trinetra.
-
-#### Via ngrok with OAuth
-
-ngrok's OAuth integration adds Google/GitHub authentication.
-
-```bash
-# Start Trinetra
-docker-compose up -d
-
-# Expose with Google OAuth (replace with your email)
-ngrok http 8080 --oauth=google --oauth-allow-email=you@gmail.com
-
-# Or allow a domain
-ngrok http 8080 --oauth=google --oauth-allow-domain=yourcompany.com
-
-# Or use GitHub
-ngrok http 8080 --oauth=github --oauth-allow-email=you@github.com
-```
-
-The ngrok OAuth feature requires a paid plan. Free alternative: use basic ngrok + Cloudflare Access.
+If you need internet access, put Trinetra behind your own auth (e.g., Cloudflare Tunnel + Access, ngrok OAuth).
 
 ### Docker
 
@@ -162,60 +98,17 @@ docker-compose up -d
 
 ## Project Structure
 
-```
-trinetra/
-├── packages/
-│   └── shared/          # Shared TypeScript types
-├── apps/
-│   ├── server/          # Fastify backend
-│   │   └── src/
-│   │       ├── index.ts       # Entry point
-│   │       ├── db.ts          # SQLite database
-│   │       ├── tmux.ts        # tmux adapter
-│   │       ├── phase-detector.ts
-│   │       ├── ws.ts          # WebSocket handler
-│   │       └── routes/        # REST API routes
-│   └── web/             # React frontend
-│       └── src/
-│           ├── api/           # API client
-│           ├── components/    # UI components
-│           ├── hooks/         # React hooks
-│           ├── pages/         # Page components
-│           └── stores/        # Zustand stores
-├── docker-compose.yml
-├── Dockerfile
-└── README.md
-```
+- `apps/server` - Fastify backend (REST + WebSocket)
+- `apps/web` - React + Vite mobile web UI
+- `packages/shared` - shared TypeScript types
 
 ## API
 
-### REST Endpoints
+- REST under `/api`, WebSocket at `/ws`. See `apps/server/src/routes`.
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/sessions` | List all sessions |
-| POST | `/api/sessions` | Create a new session |
-| GET | `/api/sessions/:id` | Get session details |
-| DELETE | `/api/sessions/:id` | Kill a session |
-| GET | `/api/workspaces` | List workspaces |
-| POST | `/api/workspaces` | Create a workspace |
-| GET | `/api/templates` | List templates |
-| POST | `/api/templates` | Create a template |
+## Troubleshooting
 
-### WebSocket Messages
-
-Connect to `/ws` for real-time updates.
-
-**Client → Server:**
-- `subscribe` - Subscribe to a pane's output
-- `unsubscribe` - Unsubscribe from a pane
-- `input` - Send text input
-- `key` - Send special key (Ctrl+C, Enter, etc.)
-
-**Server → Client:**
-- `snapshot` - Full terminal content
-- `status` - Session status update
-- `error` - Error message
+Run `pnpm doctor` to check `tmux`, ports, and the data directory.
 
 ## Configuration
 

@@ -50,11 +50,11 @@ export function useWebSocket() {
 
         switch (message.type) {
           case 'snapshot':
-            setSnapshot(message.paneKey, message.text);
+            setSnapshot(`${message.sessionId}:${message.paneKey}`, message.text);
             break;
 
           case 'output':
-            appendOutput(message.paneKey, message.chunk);
+            appendOutput(`${message.sessionId}:${message.paneKey}`, message.chunk);
             break;
 
           case 'status':

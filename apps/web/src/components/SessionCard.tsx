@@ -55,9 +55,9 @@ export default function SessionCard({ session, showPreview = true }: SessionCard
   const lastActivity = sessionState?.lastActivityAt || session.lastActivityAt;
 
   // Get preview text from output buffers
-  // Try to find output buffer for this session's active pane
-  const paneKey = session.activePane || `${session.tmuxSession}:0.0`;
-  const outputBuffer = outputBuffers[paneKey];
+  // Output buffers are keyed by `${sessionId}:${paneTarget}`
+  const paneTarget = session.activePane || '0.0';
+  const outputBuffer = outputBuffers[`${session.id}:${paneTarget}`];
   const previewText = showPreview ? getLastInterestingLine(outputBuffer?.content) : null;
 
   const handlePinClick = (e: React.MouseEvent) => {

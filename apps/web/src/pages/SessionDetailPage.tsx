@@ -4,10 +4,12 @@ import { InputMode, SessionPhase, type KeyMessage } from '@trinetra/shared';
 import { useSession, useKillSession } from '../hooks/useSessions';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { useSessionStore } from '../stores/sessionStore';
+import { useSettingsStore } from '../stores/settingsStore';
 import { stripAnsi } from '../utils/ansi';
 import StatusBadge from '../components/StatusBadge';
 import PhaseBadge from '../components/PhaseBadge';
 import OutputView from '../components/OutputView';
+import XTermView from '../components/XTermView';
 import Modal from '../components/Modal';
 
 interface PaneOption {
@@ -33,6 +35,7 @@ export default function SessionDetailPage() {
 
   const { subscribe, unsubscribe, sendInput, sendKey, isConnected } = useWebSocket();
   const { outputBuffers, sessionStates, setActiveSession } = useSessionStore();
+  const terminalRenderer = useSettingsStore((s) => s.terminalRenderer);
 
   // Build list of available panes from session windows
   const paneOptions = useMemo((): PaneOption[] => {
@@ -278,7 +281,11 @@ export default function SessionDetailPage() {
 
       {/* Full-height Terminal Output */}
       <div className="flex-1 min-h-0 overflow-hidden">
-        <OutputView content={output} sessionTitle={session.title} />
+        {terminalRenderer === 'xterm' ? (
+          <XTermView content={rawOutput} sessionTitle={session.title} />
+        ) : (
+          <OutputView content={output} sessionTitle={session.title} />
+        )}
       </div>
 
       {/* Compact Input Bar */}

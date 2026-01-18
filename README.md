@@ -129,6 +129,93 @@ Sessions created by Trinetra use the prefix `ccp_` (e.g., `ccp_ab12cd`). You can
 tmux attach -t ccp_ab12cd
 ```
 
+## Running as a Service
+
+Trinetra includes a CLI for managing the server as a background service, plus example configuration files for system service managers.
+
+### Using the CLI (`trinetra up/down`)
+
+The simplest way to run Trinetra in the background:
+
+```bash
+# Build the server first
+pnpm --filter @trinetra/server build
+
+# Install the CLI globally (from the server package)
+cd apps/server && pnpm link --global
+
+# Or run directly with pnpm
+pnpm --filter @trinetra/server cli up
+```
+
+**CLI Commands:**
+
+| Command | Description |
+|---------|-------------|
+| `trinetra up` | Start the server as a background daemon |
+| `trinetra down` | Stop the daemon (also: `trinetra stop`) |
+| `trinetra status` | Check if the server is running |
+| `trinetra logs` | Tail the log file (use `-n` for no-follow) |
+| `trinetra doctor` | Run diagnostics |
+
+**Files:**
+- PID file: `~/.trinetra/trinetra.pid`
+- Log file: `~/.trinetra/trinetra.log`
+
+### macOS launchd Service
+
+For automatic startup on macOS, use launchd:
+
+```bash
+# 1. Edit the plist file and update paths
+nano service/trinetra.plist
+
+# 2. Copy to LaunchAgents
+cp service/trinetra.plist ~/Library/LaunchAgents/com.trinetra.server.plist
+
+# 3. Load and start
+launchctl load ~/Library/LaunchAgents/com.trinetra.server.plist
+launchctl start com.trinetra.server
+```
+
+**Management:**
+```bash
+launchctl list | grep trinetra          # Check status
+launchctl stop com.trinetra.server      # Stop
+launchctl start com.trinetra.server     # Start
+launchctl unload ~/Library/LaunchAgents/com.trinetra.server.plist  # Disable
+```
+
+### Linux systemd Service
+
+For automatic startup on Linux, use systemd:
+
+```bash
+# 1. Edit the service file and update paths
+nano service/trinetra.service
+
+# 2. Copy to user systemd directory
+mkdir -p ~/.config/systemd/user
+cp service/trinetra.service ~/.config/systemd/user/
+
+# 3. Enable lingering (allows service to run without active session)
+sudo loginctl enable-linger $USER
+
+# 4. Reload, enable, and start
+systemctl --user daemon-reload
+systemctl --user enable trinetra
+systemctl --user start trinetra
+```
+
+**Management:**
+```bash
+systemctl --user status trinetra    # Check status
+systemctl --user stop trinetra      # Stop
+systemctl --user start trinetra     # Start
+systemctl --user restart trinetra   # Restart
+journalctl --user -u trinetra -f    # View logs
+```
+
 ## License
 
 MIT

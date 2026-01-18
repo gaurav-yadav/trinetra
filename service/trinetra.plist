@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+    Trinetra - macOS launchd Service Configuration
+
+    This plist configures Trinetra to run as a background service managed by launchd.
+    The server will automatically start on login and restart if it crashes.
+
+    INSTALLATION:
+
+    1. Edit this file and update the paths below to match your installation:
+       - Replace /path/to/trinetra with the actual path to the trinetra repository
+       - Replace YOUR_USERNAME with your macOS username
+
+    2. Copy this file to your LaunchAgents folder:
+       cp trinetra.plist ~/Library/LaunchAgents/com.trinetra.server.plist
+
+    3. Load the service:
+       launchctl load ~/Library/LaunchAgents/com.trinetra.server.plist
+
+    4. Start the service:
+       launchctl start com.trinetra.server
+
+    MANAGEMENT:
+
+    - Check status:     launchctl list | grep trinetra
+    - Start service:    launchctl start com.trinetra.server
+    - Stop service:     launchctl stop com.trinetra.server
+    - Unload service:   launchctl unload ~/Library/LaunchAgents/com.trinetra.server.plist
+    - View logs:        tail -f ~/.trinetra/trinetra.log
+
+    NOTES:
+
+    - The service runs as your user (not root) for security
+    - RunAtLoad=true means it starts automatically when you log in
+    - KeepAlive=true means launchd will restart it if it crashes
+    - For system-wide installation, use /Library/LaunchDaemons instead
+    -->
+
+    <!-- Unique identifier for this service -->
+    <key>Label</key>
+    <string>com.trinetra.server</string>
+
+    <!-- Command to run - using node directly with the built JS file -->
+    <key>ProgramArguments</key>
+    <array>
+        <!-- Path to node - adjust if using a different node installation -->
+        <string>/usr/local/bin/node</string>
+        <!-- Path to the compiled server - UPDATE THIS PATH -->
+        <string>/path/to/trinetra/apps/server/dist/index.js</string>
+    </array>
+
+    <!-- Working directory - UPDATE THIS PATH -->
+    <key>WorkingDirectory</key>
+    <string>/path/to/trinetra/apps/server</string>
+
+    <!-- Environment variables -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <!-- Bind to all interfaces for remote access, or 127.0.0.1 for local only -->
+        <key>TRINETRA_HOST</key>
+        <string>127.0.0.1</string>
+
+        <!-- Server port -->
+        <key>TRINETRA_PORT</key>
+        <string>3001</string>
+
+        <!-- Data directory - UPDATE THIS PATH -->
+        <key>TRINETRA_DATA_DIR</key>
+        <string>/path/to/trinetra/data</string>
+
+        <!-- Ensure proper PATH for tmux and other tools -->
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin</string>
+    </dict>
+
+    <!-- Log files -->
+    <key>StandardOutPath</key>
+    <string>/Users/YOUR_USERNAME/.trinetra/trinetra.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/YOUR_USERNAME/.trinetra/trinetra.log</string>
+
+    <!-- Start automatically when user logs in -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Restart automatically if the process exits -->
+    <key>KeepAlive</key>
+    <true/>
+
+    <!-- Wait 10 seconds between restart attempts -->
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <!-- Nice level (lower = higher priority, 0 is normal) -->
+    <key>Nice</key>
+    <integer>0</integer>
+</dict>
+</plist>

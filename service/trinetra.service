@@ -1,0 +1,108 @@
+# Trinetra - Linux systemd Service Configuration
+#
+# This unit file configures Trinetra to run as a background service managed by systemd.
+# The server will automatically start on boot and restart if it crashes.
+#
+# INSTALLATION (User Service - Recommended):
+#
+# 1. Edit this file and update the paths below to match your installation:
+#    - Replace /path/to/trinetra with the actual path to the trinetra repository
+#    - Replace YOUR_USERNAME with your Linux username
+#
+# 2. Create the systemd user directory if it doesn't exist:
+#    mkdir -p ~/.config/systemd/user
+#
+# 3. Copy this file to your systemd user directory:
+#    cp trinetra.service ~/.config/systemd/user/trinetra.service
+#
+# 4. Reload systemd to pick up the new service:
+#    systemctl --user daemon-reload
+#
+# 5. Enable the service (start on login):
+#    systemctl --user enable trinetra
+#
+# 6. Start the service:
+#    systemctl --user start trinetra
+#
+# INSTALLATION (System Service - requires root):
+#
+# 1. Edit this file and update the paths
+#
+# 2. Copy to system directory:
+#    sudo cp trinetra.service /etc/systemd/system/trinetra.service
+#
+# 3. For system service, add User= and Group= directives under [Service]
+#
+# 4. Reload and enable:
+#    sudo systemctl daemon-reload
+#    sudo systemctl enable trinetra
+#    sudo systemctl start trinetra
+#
+# MANAGEMENT:
+#
+# - Check status:     systemctl --user status trinetra
+# - Start service:    systemctl --user start trinetra
+# - Stop service:     systemctl --user stop trinetra
+# - Restart service:  systemctl --user restart trinetra
+# - View logs:        journalctl --user -u trinetra -f
+# - Disable service:  systemctl --user disable trinetra
+#
+# NOTES:
+#
+# - User services require "lingering" to run without an active session:
+#   sudo loginctl enable-linger YOUR_USERNAME
+# - The service runs as your user (not root) for security
+# - Restart=on-failure means systemd will restart it if it crashes
+# - For system-wide installation, use /etc/systemd/system instead
+
+[Unit]
+Description=Trinetra Terminal Session Monitor
+Documentation=https://github.com/your-org/trinetra
+After=network.target
+
+# Optional: start after tmux socket directory exists
+# After=network.target tmux.socket
+
+[Service]
+Type=simple
+
+# Command to run - UPDATE THIS PATH
+ExecStart=/usr/bin/node /path/to/trinetra/apps/server/dist/index.js
+
+# Working directory - UPDATE THIS PATH
+WorkingDirectory=/path/to/trinetra/apps/server
+
+# Environment variables
+Environment=TRINETRA_HOST=127.0.0.1
+Environment=TRINETRA_PORT=3001
+# UPDATE THIS PATH
+Environment=TRINETRA_DATA_DIR=/path/to/trinetra/data
+Environment=NODE_ENV=production
+
+# Ensure proper PATH for tmux and other tools
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+
+# Restart policy
+Restart=on-failure
+RestartSec=10
+
+# Stop timeout - allow graceful shutdown
+TimeoutStopSec=30
+
+# Security hardening (optional but recommended)
+# NoNewPrivileges=true
+# ProtectSystem=strict
+# ProtectHome=read-only
+# PrivateTmp=true
+
+# Resource limits (optional)
+# MemoryMax=512M
+# CPUQuota=50%
+
+# Log output to journal
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=trinetra
+
+[Install]
+WantedBy=default.target

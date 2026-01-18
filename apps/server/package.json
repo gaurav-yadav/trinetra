@@ -2,12 +2,16 @@
   "name": "@trinetra/server",
   "version": "1.0.0",
   "type": "module",
+  "bin": {
+    "trinetra": "./dist/cli.js"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
-    "doctor": "tsx src/doctor.ts"
+    "doctor": "tsx src/doctor.ts",
+    "cli": "tsx src/cli.ts"
   },
   "dependencies": {
     "@trinetra/shared": "workspace:*",

@@ -5,7 +5,7 @@ import { useWebSocket } from '../hooks/useWebSocket';
 import { requestNotificationPermission } from '../utils/notifications';
 
 export default function SettingsPage() {
-  const { serverUrl, setServerUrl, notificationsEnabled, setNotificationsEnabled } = useSettingsStore();
+  const { serverUrl, setServerUrl, notificationsEnabled, setNotificationsEnabled, terminalRenderer, setTerminalRenderer } = useSettingsStore();
   const wsConnected = useSessionStore((s) => s.wsConnected);
   const { connect, disconnect } = useWebSocket();
 
@@ -122,6 +122,54 @@ export default function SettingsPage() {
                 Reconnect
               </button>
             )}
+          </div>
+        </section>
+
+        {/* Terminal Renderer */}
+        <section className="card">
+          <div className="p-4 border-b border-gray-800">
+            <h2 className="font-medium text-gray-100">Terminal Renderer</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Choose how terminal output is rendered
+            </p>
+          </div>
+          <div className="p-4 space-y-4">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setTerminalRenderer('simple')}
+                className={`flex-1 p-3 rounded-lg border transition-colors ${
+                  terminalRenderer === 'simple'
+                    ? 'border-blue-500 bg-blue-500/10'
+                    : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+                }`}
+              >
+                <div className="text-left">
+                  <div className={`font-medium ${terminalRenderer === 'simple' ? 'text-blue-400' : 'text-gray-200'}`}>
+                    Simple
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    Lightweight, built-in search, current behavior
+                  </div>
+                </div>
+              </button>
+              <button
+                onClick={() => setTerminalRenderer('xterm')}
+                className={`flex-1 p-3 rounded-lg border transition-colors ${
+                  terminalRenderer === 'xterm'
+                    ? 'border-blue-500 bg-blue-500/10'
+                    : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+                }`}
+              >
+                <div className="text-left">
+                  <div className={`font-medium ${terminalRenderer === 'xterm' ? 'text-blue-400' : 'text-gray-200'}`}>
+                    XTerm.js
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    ANSI colors, text selection, richer rendering
+                  </div>
+                </div>
+              </button>
+            </div>
           </div>
         </section>
 

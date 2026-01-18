@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply antialiased;
+  }
+
+  /* Custom scrollbar for terminal */
+  .terminal-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .terminal-scrollbar::-webkit-scrollbar-track {
+    @apply bg-terminal-bg;
+  }
+
+  .terminal-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-terminal-border rounded-full;
+  }
+
+  .terminal-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-600;
+  }
+}
+
+@layer components {
+  .touch-target {
+    @apply min-h-touch min-w-touch;
+  }
+
+  .btn {
+    @apply touch-target px-4 py-2 rounded-lg font-medium transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100;
+  }
+
+  .btn-primary {
+    @apply btn bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700 active:bg-red-800;
+  }
+
+  .btn-secondary {
+    @apply btn bg-gray-700 text-gray-100 hover:bg-gray-600 active:bg-gray-500;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-gray-300 hover:bg-gray-800 active:bg-gray-700;
+  }
+
+  .card {
+    @apply bg-gray-900 rounded-xl border border-gray-800 overflow-hidden;
+  }
+
+  .input {
+    @apply touch-target w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-gray-400 mb-1.5;
+  }
+}

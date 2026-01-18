@@ -1,7 +1,7 @@
 # Trinetra
 
 Remote control for your terminal sessions — monitor and interact with long-running CLI tools from your phone.
-<img width="2912" height="1440" alt="banner" src="https://github.com/user-attachments/assets/79d935bb-92c0-45cd-b392-79c8a659d774" />
+<img width="1456" height="720" alt="banner2" src="https://github.com/user-attachments/assets/7b1f5657-b868-4f87-938b-76db9175b30c" />
 
 Trinetra mirrors your `tmux` sessions to a mobile web UI. Start a run on your laptop, step away, and still be the one who unblocks it when it asks for input (`y/N` prompts, agent approvals, `Ctrl+C`, etc.).
 

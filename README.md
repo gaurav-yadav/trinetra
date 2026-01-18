@@ -17,8 +17,6 @@ Run it only on **localhost** or a trusted private network like **Tailscale**. Do
 You kick off something that takes 20 minutes. Then life happens: coffee, commute, meeting.
 
 The CLI doesn't fail when you're away — it waits for a prompt you didn't see. Trinetra turns that dead time into progress: peek in, answer the prompt, and keep going.
-![sessions](https://github.com/user-attachments/assets/b1b68968-14a3-46d6-ad1d-1fc58066c7a2)
-<img width="1536" height="2752" alt="working" src="https://github.com/user-attachments/assets/36fe9e8b-ddf1-4917-9625-ff6e67ccb602" />
 
 ## Use Cases
 
@@ -36,6 +34,9 @@ The CLI doesn't fail when you're away — it waits for a prompt you didn't see. 
 - **Phase Detection** - Automatic detection of session state (thinking, tool use, idle, etc.)
 - **Workspaces & Templates** - Save frequently used project paths and launch commands
 - **Works Over Tailscale** - Secure access from anywhere
+
+<img width="400" height="752" alt="Screenshot 2026-01-18 at 1 48 56 PM" src="https://github.com/user-attachments/assets/da76221f-dfa0-4e7c-b02d-049ba39f8e87" />
+<img width="416" height="752" alt="working" src="https://github.com/user-attachments/assets/36fe9e8b-ddf1-4917-9625-ff6e67ccb602" />
 
 ## Quick Start
 

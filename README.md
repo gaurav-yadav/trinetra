@@ -1,8 +1,10 @@
 # Trinetra
 
 Remote control for your terminal sessions — monitor and interact with long-running CLI tools from your phone.
+<img width="2912" height="1440" alt="banner" src="https://github.com/user-attachments/assets/79d935bb-92c0-45cd-b392-79c8a659d774" />
 
 Trinetra mirrors your `tmux` sessions to a mobile web UI. Start a run on your laptop, step away, and still be the one who unblocks it when it asks for input (`y/N` prompts, agent approvals, `Ctrl+C`, etc.).
+
 
 ## Security Warning (read first)
 
@@ -15,6 +17,8 @@ Run it only on **localhost** or a trusted private network like **Tailscale**. Do
 You kick off something that takes 20 minutes. Then life happens: coffee, commute, meeting.
 
 The CLI doesn't fail when you're away — it waits for a prompt you didn't see. Trinetra turns that dead time into progress: peek in, answer the prompt, and keep going.
+![sessions](https://github.com/user-attachments/assets/b1b68968-14a3-46d6-ad1d-1fc58066c7a2)
+<img width="1536" height="2752" alt="working" src="https://github.com/user-attachments/assets/36fe9e8b-ddf1-4917-9625-ff6e67ccb602" />
 
 ## Use Cases
 
